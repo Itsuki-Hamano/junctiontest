@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JSSample</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+</head>
+<body>
+
+<img src="./cloud_images/keyaki1.jpg" id="MyImg">
+
+<script type="text/javascript">
+function ImageToBase64(img, mime_type) {
+    // New Canvas
+    var canvas = document.createElement('canvas');
+    canvas.width  = img.width;
+    canvas.height = img.height;
+    // Draw Image
+    var ctx = canvas.getContext('2d');
+    //ctx.drawImage(img, 0, 0);
+    console.log(canvas.toDataURL(mime_type))
+    // To Base64
+    return canvas.toDataURL(mime_type);
+}
+
+//=====================================================
+// 使い方
+//=====================================================
+var img = document.getElementById('MyImg');
+var img_64 = ImageToBase64(img, "image/jpeg"); // "data:image/jpeg;base64,XXXXXX..." みたいな文字列
+
+    $(function() {
+        var params = {
+            // Request parameters
+            "returnFaceId": "true",
+            "returnFaceLandmarks": "false",
+            //"returnFaceAttributes": "{string}",
+        };    
+        $.ajax({
+            url: "https://eastasia.api.cognitive.microsoft.com/face/v1.0/detect?" + $.param(params),
+            beforeSend: function(xhrObj){
+                // Request headers
+                xhrObj.setRequestHeader("Content-Type","application/octet-stream");
+                xhrObj.setRequestHeader("Ocp-Apim-Subscription-Key","7e3d5a5ad27545b3a3c5c07e195829f0");
+            },
+            type: "POST",
+            // Request body
+            data:img_64,
+        })
+        .success(function(data) {
+            alert("success");
+            console.log(data)
+        })
+        .error(function(XMLHttpRequest, textStatus, errorThrown) {
+            alert('error!!!');
+            console.log("XMLHttpRequest : " + XMLHttpRequest.status);
+            console.log("textStatus     : " + textStatus);
+            console.log("errorThrown    : " + errorThrown.message);
+        });
+    });
+</script>
+</body>
+</html>
